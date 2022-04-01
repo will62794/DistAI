@@ -1,0 +1,318 @@
+=== Running benchmark 1/29: 'tla-consensus'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-tla-consensus.py
+Simulation finished. Trace written to traces/ivybench-tla-consensus.csv
+Invariant enumeration finished
+Refinement round 1: Invariants validated, protocol proved.
+Counterexamples: 0
+Invariants: 0
+DistInv runtime: 1.789s
+Breakdown:  simulation 0.315s  learning 0.000s  refinement 1.474s
+=== Running benchmark 2/29: 'tla-tcommit'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-tla-tcommit.py
+Simulation finished. Trace written to traces/ivybench-tla-tcommit.csv
+Invariant enumeration finished
+Refinement round 1: Invariants validated, protocol proved.
+Counterexamples: 0
+Invariants: 6
+DistInv runtime: 1.931s
+Breakdown:  simulation 0.343s  learning 0.000s  refinement 1.588s
+=== Running benchmark 3/29: 'i4-lock-server'
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 4/29: 'ex-quorum-leader-election'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-ex-quorum-leader-election.py
+Simulation finished. Trace written to traces/ivybench-ex-quorum-leader-election.csv
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: Invariants validated, protocol proved.
+Counterexamples: 0
+Invariants: 7
+DistInv runtime: 3.732s
+Breakdown:  simulation 0.630s  learning 0.003s  refinement 3.099s
+=== Running benchmark 5/29: 'pyv-toy-consensus-forall'
+Invalid function declaration voting_quorum: quorum
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 6/29: 'tla-simple'
+Ivy expr ring.get_prev(self) cannot be parsed
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 7/29: 'ex-lockserv-automaton'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-ex-lockserv-automaton.py
+Simulation finished. Trace written to traces/ivybench-ex-lockserv-automaton.csv
+Invariant enumeration finished
+Refinement round 1: Invariants validated, protocol proved.
+Counterexamples: 0
+Invariants: 12
+DistInv runtime: 2.062s
+Breakdown:  simulation 0.391s  learning 0.000s  refinement 1.671s
+=== Running benchmark 8/29: 'tla-simpleregular'
+Ivy expr ring.get_prev(self) cannot be parsed
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 9/29: 'pyv-sharded-kv'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-pyv-sharded-kv.py
+Simulation finished. Trace written to traces/ivybench-pyv-sharded-kv.csv
+Invariant enumeration finished
+Refinement round 1: Invariants validated, protocol proved.
+Counterexamples: 0
+Invariants: 15
+DistInv runtime: 2.121s
+Breakdown:  simulation 0.466s  learning 0.001s  refinement 1.654s
+=== Running benchmark 10/29: 'pyv-lockserv'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-pyv-lockserv.py
+Simulation finished. Trace written to traces/ivybench-pyv-lockserv.csv
+Invariant enumeration finished
+Refinement round 1: Invariants validated, protocol proved.
+Counterexamples: 0
+Invariants: 12
+DistInv runtime: 2.138s
+Breakdown:  simulation 0.501s  learning 0.000s  refinement 1.637s
+=== Running benchmark 11/29: 'tla-twophase'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-tla-twophase.py
+Simulation finished. Trace written to traces/ivybench-tla-twophase.csv
+Invariant enumeration finished
+Refinement round 1: 4 invariants not inductive
+Refinement round 2: Safety property failed.
+Enable second step of minimum weakening
+Refinement round 1: 4 invariants not inductive
+Refinement round 2: 36 invariants not inductive
+Refinement round 3: 81 invariants not inductive
+Refinement round 4: 29 invariants not inductive
+Refinement round 5: 30 invariants not inductive
+Refinement round 6: 40 invariants not inductive
+Refinement round 7: Invariants validated, protocol proved.
+Counterexamples: 224
+Invariants: 305
+DistInv runtime: 29.428s
+Breakdown:  simulation 0.484s  learning 0.000s  refinement 28.944s
+=== Running benchmark 12/29: 'i4-learning-switch'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-i4-learning-switch.py
+Simulation finished. Trace written to traces/ivybench-i4-learning-switch.csv
+Invariant enumeration finished
+Refinement round 1: 18 invariants not inductive
+Refinement round 2: 1 invariants not inductive
+Refinement round 3: Invariants validated, protocol proved.
+Counterexamples: 19
+Invariants: 31
+DistInv runtime: 21.830s
+Breakdown:  simulation 10.194s  learning 0.169s  refinement 11.467s
+=== Running benchmark 13/29: 'ex-simple-decentralized-lock'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-ex-simple-decentralized-lock.py
+Simulation finished. Trace written to traces/ivybench-ex-simple-decentralized-lock.csv
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-ex-simple-decentralized-lock.py
+Simulation finished. Trace written to traces/ivybench-ex-simple-decentralized-lock.csv
+Invariant enumeration finished
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: Safety property failed.
+Enable second step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 16 invariants not inductive
+Refinement round 3: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: Safety property failed.
+Enable second step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 16 invariants not inductive
+Refinement round 3: 114 invariants not inductive
+Refinement round 4: Safety property failed.
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-ex-simple-decentralized-lock.py
+Simulation finished. Trace written to traces/ivybench-ex-simple-decentralized-lock.csv
+Invariant enumeration finished
+Refinement round 1: Invariants validated, protocol proved.
+Re-simulate protocol with larger instances
+Re-simulate protocol with larger instances
+Counterexamples: 150
+Invariants: 16
+DistInv runtime: 26.908s
+Breakdown:  simulation 1.585s  learning 0.038s  refinement 25.285s
+=== Running benchmark 14/29: 'i4-two-phase-commit'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-i4-two-phase-commit.py
+Simulation finished. Trace written to traces/ivybench-i4-two-phase-commit.csv
+Invariant enumeration finished
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: Safety property failed.
+Enable second step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 8 invariants not inductive
+Refinement round 3: 27 invariants not inductive
+Refinement round 4: 7 invariants not inductive
+Refinement round 5: 6 invariants not inductive
+Refinement round 6: Invariants validated, protocol proved.
+Counterexamples: 50
+Invariants: 66
+DistInv runtime: 17.473s
+Breakdown:  simulation 0.440s  learning 0.002s  refinement 17.031s
+=== Running benchmark 15/29: 'pyv-consensus-wo-decide'
+Invalid function declaration voting_quorum: quorum
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 16/29: 'pyv-consensus-forall'
+Invalid function declaration voting_quorum: quorum
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 17/29: 'pyv-learning-switch'
+Warning! Relation pending has arity 4. DistAI has a known limitation dealing with high-arity relations of one type. Additional heuristics are applied to reduce the search space, but there is still a decent chance of timeout.
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-pyv-learning-switch.py
+Simulation finished. Trace written to traces/ivybench-pyv-learning-switch.csv
+There are too many predicates (96) that can appear in the invariants. Bounding initial max-literal to <=2.
+Invariant enumeration finished
+Refinement round 1: 74 invariants not inductive
+Refinement round 2: Invariants validated, protocol proved.
+Counterexamples: 74
+Invariants: 69
+DistInv runtime: 81.895s
+Breakdown:  simulation 58.715s  learning 0.113s  refinement 23.067s
+=== Running benchmark 18/29: 'i4-chord-ring-maintenance'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-i4-chord-ring-maintenance.py
+Simulation finished. Trace written to traces/ivybench-i4-chord-ring-maintenance.csv
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: 29 invariants not inductive
+Refinement round 2: 4 invariants not inductive
+Refinement round 3: Invariants validated, protocol proved.
+Counterexamples: 33
+Invariants: 163
+DistInv runtime: 56.261s
+Breakdown:  simulation 6.182s  learning 1.157s  refinement 48.922s
+=== Running benchmark 19/29: 'pyv-sharded-kv-no-lost-keys'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-pyv-sharded-kv-no-lost-keys.py
+Simulation finished. Trace written to traces/ivybench-pyv-sharded-kv-no-lost-keys.csv
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-pyv-sharded-kv-no-lost-keys.py
+Simulation finished. Trace written to traces/ivybench-pyv-sharded-kv-no-lost-keys.csv
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-pyv-sharded-kv-no-lost-keys.py
+Simulation finished. Trace written to traces/ivybench-pyv-sharded-kv-no-lost-keys.csv
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Re-simulate protocol with larger instances
+Re-simulate protocol with larger instances
+=== Running benchmark 20/29: 'ex-naive-consensus'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-ex-naive-consensus.py
+Simulation finished. Trace written to traces/ivybench-ex-naive-consensus.csv
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: Safety property failed.
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-ex-naive-consensus.py
+Simulation finished. Trace written to traces/ivybench-ex-naive-consensus.csv
+Invariant enumeration finished
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: Safety property failed.
+Enable second step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 8 invariants not inductive
+Refinement round 3: Safety property failed.
+Enable third step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 9 invariants not inductive
+Refinement round 3: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: Safety property failed.
+Enable second step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 8 invariants not inductive
+Refinement round 3: 22 invariants not inductive
+Refinement round 4: Safety property failed.
+Enable third step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 9 invariants not inductive
+Refinement round 3: 36 invariants not inductive
+Refinement round 4: Safety property failed.
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-ex-naive-consensus.py
+Simulation finished. Trace written to traces/ivybench-ex-naive-consensus.csv
+Invariant enumeration finished
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: Safety property failed.
+Enable second step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 8 invariants not inductive
+Refinement round 3: Safety property failed.
+Enable third step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 11 invariants not inductive
+Refinement round 3: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: Safety property failed.
+Enable second step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 8 invariants not inductive
+Refinement round 3: 22 invariants not inductive
+Refinement round 4: Safety property failed.
+Enable third step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 11 invariants not inductive
+Refinement round 3: 62 invariants not inductive
+Refinement round 4: Safety property failed.
+Retry with new template/max-literal
+Invariant enumeration finished
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: Safety property failed.
+Enable second step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 8 invariants not inductive
+Refinement round 3: 22 invariants not inductive
+Refinement round 4: 28 invariants not inductive
+Refinement round 5: Safety property failed.
+Enable third step of minimum weakening
+Refinement round 1: 1 invariants not inductive
+Refinement round 2: 11 invariants not inductive
+Refinement round 3: 62 invariants not inductive
+Refinement round 4: 265 invariants not inductive
+Refinement round 5: Safety property failed.
+Re-simulate protocol with larger instances
+Re-simulate protocol with larger instances
+=== Running benchmark 21/29: 'pyv-client-server-ae'
+Ivy expr responseMatched(N, P) cannot be parsed
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 22/29: 'ex-simple-election'
+Unparsable relation: didNotPromise(A:acceptor) = forall P. ~promise(A, P)
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 23/29: 'pyv-toy-consensus-epr'
+Unparsable relation: chosenAt(Q:quorum, V:value) = forall N. member(N, Q) -> vote(N, V)
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 24/29: 'ex-toy-consensus'
+Unparsable relation: didNotVote(N:node) = forall V. ~vote(N, V)
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 25/29: 'pyv-client-server-db-ae'
+Ivy expr responseMatched(N, P) cannot be parsed
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 26/29: 'pyv-hybrid-reliable-broadcast'
+Unparsable relation: chosenAtA(X:node) = exists A. forall N. member_a(N,A) -> rcv_msg(N,X)
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 27/29: 'pyv-firewall'
+Instrumenting finished. Simulation script written to auto_samplers/ivybench-pyv-firewall.py
+Simulation finished. Trace written to traces/ivybench-pyv-firewall.csv
+Invariant enumeration finished
+Ivy check failed. Check ivy_check_log.txt for details
+=== Running benchmark 28/29: 'ex-majorityset-leader-election'
+Invalid function declaration emptyset : nodeset
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...
+=== Running benchmark 29/29: 'pyv-consensus-epr'
+Unparsable relation: chosen(X:node) = exists Q:quorum. forall N. member(N, Q) -> votes(X, N)
+translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the limitation of DistAI, which does not support all Ivy features. Exiting...

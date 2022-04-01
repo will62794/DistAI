@@ -1,0 +1,49 @@
+#lang ivy1.7
+
+# Source: https://github.com/sat-group/cfg-enum/blob/permissive/benchmarks/simple-de-lock.ivy
+
+type node
+
+relation message(Src: node, Dst: node)
+relation has_lock(N: node)
+
+individual start_node: node
+
+after init {
+	message(Src, Dst) := false;
+	has_lock(X) := X = start_node;
+}
+
+action send(src: node, dst: node) = {
+    assume has_lock(src);
+    message(src, dst) := true;
+    has_lock(src) := false;
+}
+
+action recv(src: node, dst: node) = {
+    assume message(src, dst);
+    message(src, dst) := false;
+    has_lock(dst) := true;
+}
+
+export send
+export recv
+
+invariant [1000000] X ~= Y -> ~(has_lock(X) & has_lock(Y))
+
+invariant [1000] forall N1:node. ~message(N1,N1) | ~has_lock(N1)
+invariant [2000] forall N1:node, N2:node. N1 ~= N2 -> ~message(N1,N1) | ~message(N2,N1)
+invariant [2001] forall N1:node, N2:node. N1 ~= N2 -> ~message(N1,N1) | ~has_lock(N2)
+invariant [2002] forall N1:node, N2:node. N1 ~= N2 -> ~message(N1,N1) | ~message(N1,N2)
+invariant [2003] forall N1:node, N2:node. N1 ~= N2 -> ~message(N1,N2) | ~message(N2,N1)
+invariant [2004] forall N1:node, N2:node. N1 ~= N2 -> ~message(N1,N2) | ~has_lock(N1)
+invariant [2005] forall N1:node, N2:node. N1 ~= N2 -> ~start_node=N1 | ~start_node=N2
+invariant [2006] forall N1:node, N2:node. N1 ~= N2 -> ~message(N1,N2) | ~has_lock(N2)
+invariant [2007] forall N1:node, N2:node. N1 ~= N2 -> ~message(N1,N1) | ~message(N2,N2)
+invariant [2008] forall N1:node, N2:node. N1 ~= N2 -> ~has_lock(N1) | ~has_lock(N2)
+invariant [3000] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> ~message(N1,N2) | ~message(N3,N2)
+invariant [3001] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> ~message(N1,N2) | ~message(N2,N3)
+invariant [3002] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> ~message(N1,N1) | ~message(N2,N3)
+invariant [3003] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> ~message(N1,N2) | ~message(N1,N3)
+invariant [3004] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> ~message(N1,N2) | ~has_lock(N3)
+invariant [4000] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> ~message(N1,N2) | ~message(N3,N4)

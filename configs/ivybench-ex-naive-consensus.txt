@@ -1,0 +1,3 @@
+same-type: node: N1, N2; quorum: Q1, Q2; value: V1, V2
+max-literal: 3
+safety-property: decision(V1) & decision(V2) -> V1 = V2

@@ -1,0 +1,5 @@
+same-type: node: NO1, NO2; nset: NS1
+max-literal: 3
+hard: true
+safety-property: (isleader(N) & isleader(M)) -> N = M
+checked-inv: voted, 2, 1, node, NO

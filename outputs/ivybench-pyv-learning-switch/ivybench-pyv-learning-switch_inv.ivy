@@ -1,0 +1,115 @@
+#lang ivy1.7
+
+# This example has a forall-exists invariant, but actually it also has a universal invariant
+
+type node
+
+relation table(N0:node, N1:node, N2:node)
+relation pending(N0:node, N1:node, N2:node, N3:node)
+
+after init  {
+	table(T, N1, N2) := (N1 = N2);
+	pending(PS, PD, S, D) := false;
+}
+
+action new_packet(ps: node, pd: node) = {
+  pending(ps, pd, ps, ps) := true;
+}
+
+action forward(ps: node, pd: node, sw0: node, sw1: node, nondet: node) = {
+  require pending(ps, pd, sw0, sw1);
+
+  pending(PS,PD,S,D) := pending(PS,PD,S,D) & (PS = nondet);
+  pending(ps,pd,sw1,D) := true;
+  
+  if (ps ~= sw1) & (forall W. W ~= sw1 -> ~table(ps, sw1, W)) {
+    table(ps,N1,N2) := table(ps,N1,N2) | (table(ps, N1, sw1) & table(ps, sw0, N2));
+  }
+}
+
+export new_packet
+export forward
+
+invariant [1000000] (forall T, X. table(T,X,X)) & (forall T, X, Y, Z. table(T,X,Y) & table(T,Y,Z) -> table(T,X,Z)) & (forall T, X, Y. table(T,X,Y) & table(T,Y,X) -> X = Y) & (forall T, X, Y, Z. table(T,X,Y) & table(T,X,Z) -> table(T,Y,Z) | table(T,Z,Y))
+
+#invariant [safety_1] table(T,X,X)
+#invariant [safety_2] table(T,X,Y) & table(T,Y,Z) -> table(T,X,Z)
+#invariant [safety_3] table(T,X,Y) & table(T,Y,X) -> X = Y
+#invariant [safety_4] table(T,X,Y) & table(T,X,Z) -> table(T,Y,Z) | table(T,Z,Y)
+
+#invariant [help_1] pending(PS,PD,S,D) & PS ~= S -> exists W. table(PS,S,W) & W ~= S
+#invariant [help_2] table(T,X,Y) & T ~= Y & X ~= Y -> exists W. table(T,Y,W) & W ~= Y
+
+# alternative which is purely universally quantified:
+#invariant [help_3] pending(PS,PD,S,D) & PS ~= S -> table(PS,S,PS)
+#invariant [help_4] table(T,X,Y) & T ~= Y & X ~= Y -> table(T,Y,T)
+
+invariant [1000] forall N1:node. table(N1,N1,N1)
+invariant [2000] forall N1:node, N2:node. N1 ~= N2 -> table(N1,N2,N1) | ~pending(N1,N2,N2,N1)
+invariant [2001] forall N1:node, N2:node. N1 ~= N2 -> pending(N1,N1,N2,N1) | ~pending(N1,N1,N2,N2)
+invariant [2002] forall N1:node, N2:node. N1 ~= N2 -> table(N2,N2,N2)
+invariant [2003] forall N1:node, N2:node. N1 ~= N2 -> ~table(N1,N1,N2)
+invariant [2004] forall N1:node, N2:node. N1 ~= N2 -> table(N1,N2,N1) | ~pending(N1,N1,N2,N1)
+invariant [2005] forall N1:node, N2:node. N1 ~= N2 -> pending(N1,N1,N2,N2) | ~pending(N1,N1,N2,N1)
+invariant [2006] forall N1:node, N2:node. N1 ~= N2 -> table(N1,N2,N2)
+invariant [2007] forall N1:node, N2:node. N1 ~= N2 -> table(N1,N2,N1) | ~pending(N1,N1,N2,N2)
+invariant [2008] forall N1:node, N2:node. N1 ~= N2 -> pending(N1,N2,N1,N1) | ~pending(N1,N2,N1,N2)
+invariant [2009] forall N1:node, N2:node. N1 ~= N2 -> pending(N1,N1,N1,N1) | ~pending(N1,N1,N1,N2)
+invariant [2010] forall N1:node, N2:node. N1 ~= N2 -> table(N1,N2,N1) | ~pending(N1,N2,N2,N2)
+invariant [2011] forall N1:node, N2:node. N1 ~= N2 -> pending(N1,N2,N2,N2) | ~pending(N1,N2,N2,N1)
+invariant [2012] forall N1:node, N2:node. N1 ~= N2 -> pending(N1,N2,N2,N1) | ~pending(N1,N2,N2,N2)
+invariant [3000] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N1,N1,N1) | ~pending(N1,N1,N1,N3)
+invariant [3001] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N1,N2,N1) | ~pending(N1,N1,N2,N3)
+invariant [3002] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N3,N1) | ~pending(N1,N2,N3,N3)
+invariant [3003] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N1,N3,N3) | ~pending(N1,N1,N3,N1)
+invariant [3004] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N1,N3,N1) | ~pending(N1,N1,N3,N1)
+invariant [3005] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N3,N3) | ~pending(N1,N2,N3,N1)
+invariant [3006] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N1,N2,N1) | ~pending(N1,N2,N2,N3)
+invariant [3007] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N1,N1,N2) | ~pending(N1,N1,N1,N3)
+invariant [3008] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N1,N2,N3) | ~pending(N1,N1,N2,N1)
+invariant [3009] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N1,N3,N1) | ~pending(N1,N2,N3,N1)
+invariant [3010] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N1,N3,N3)
+invariant [3011] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> ~table(N1,N1,N3)
+invariant [3012] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N1,N2) | ~pending(N1,N2,N1,N3)
+invariant [3013] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N1,N2,N1) | ~table(N1,N3,N2)
+invariant [3014] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N1,N3,N1) | ~pending(N1,N2,N3,N3)
+invariant [3015] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N1,N2,N2) | ~pending(N1,N1,N2,N3)
+invariant [3016] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N1,N3,N1) | ~pending(N1,N1,N3,N3)
+invariant [3017] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N1,N2,N3) | ~pending(N1,N1,N2,N2)
+invariant [3018] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N1,N1) | ~pending(N1,N2,N1,N3)
+invariant [3019] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N1,N3) | ~pending(N1,N2,N1,N2)
+invariant [3020] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N2,N1) | ~pending(N1,N2,N2,N3)
+invariant [3021] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N3,N3,N3)
+invariant [3022] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N2,N3) | ~pending(N1,N2,N2,N2)
+invariant [3023] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N3,N1) | ~pending(N1,N2,N3,N2)
+invariant [3024] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N3,N2) | ~pending(N1,N2,N3,N1)
+invariant [3025] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N1,N3,N1) | ~pending(N1,N1,N3,N3)
+invariant [3026] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N3,N2) | ~pending(N1,N2,N3,N3)
+invariant [3027] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> ~table(N1,N2,N3) | ~table(N1,N3,N2)
+invariant [3028] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N1,N3,N1) | ~pending(N1,N2,N3,N2)
+invariant [3029] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N2,N3) | ~pending(N1,N2,N2,N1)
+invariant [3030] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N3,N3) | ~pending(N1,N2,N3,N2)
+invariant [3031] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N2,N2,N2) | ~pending(N1,N2,N2,N3)
+invariant [3032] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> pending(N1,N1,N2,N1) | ~pending(N1,N1,N2,N3)
+invariant [3033] forall N1:node, N2:node, N3:node. N1 ~= N2 & N1 ~= N3 & N2 ~= N3 -> table(N1,N2,N1) | ~table(N1,N2,N3)
+invariant [4000] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N1,N3,N4) | ~pending(N1,N1,N3,N3)
+invariant [4001] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> ~table(N3,N3,N4)
+invariant [4002] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> table(N1,N3,N1) | ~table(N1,N4,N3)
+invariant [4003] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N2,N3,N4) | ~pending(N1,N2,N3,N3)
+invariant [4004] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N2,N3,N3) | ~pending(N1,N2,N3,N4)
+invariant [4005] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N1,N3,N4) | ~pending(N1,N1,N3,N1)
+invariant [4006] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> table(N1,N3,N1) | ~pending(N1,N2,N3,N4)
+invariant [4007] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N1,N1,N3) | ~pending(N1,N1,N1,N4)
+invariant [4008] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N1,N3,N1) | ~pending(N1,N1,N3,N4)
+invariant [4009] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N1,N3,N3) | ~pending(N1,N1,N3,N4)
+invariant [4010] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N2,N3,N1) | ~pending(N1,N2,N3,N4)
+invariant [4011] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N2,N3,N4) | ~pending(N1,N2,N3,N1)
+invariant [4012] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> ~table(N1,N3,N4) | ~table(N1,N4,N3)
+invariant [4013] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N2,N1,N3) | ~pending(N1,N2,N1,N4)
+invariant [4014] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N2,N3,N4) | ~pending(N1,N2,N3,N2)
+invariant [4015] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N2,N2,N3) | ~pending(N1,N2,N2,N4)
+invariant [4016] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> table(N1,N3,N1) | ~table(N1,N3,N4)
+invariant [4017] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> table(N3,N4,N4)
+invariant [4018] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> table(N1,N3,N1) | ~pending(N1,N1,N3,N4)
+invariant [4019] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N2,N3,N2) | ~pending(N1,N2,N3,N4)
+invariant [4020] forall N1:node, N2:node, N3:node, N4:node. N1 ~= N2 & N1 ~= N3 & N1 ~= N4 & N2 ~= N3 & N2 ~= N4 & N3 ~= N4 -> pending(N1,N1,N2,N3) | ~pending(N1,N1,N2,N4)

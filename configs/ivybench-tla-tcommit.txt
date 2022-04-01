@@ -1,0 +1,3 @@
+same-type: resource_manager: R1
+max-literal: 3
+safety-property: forall R1, R2. ~(aborted(R1) & committed(R2))

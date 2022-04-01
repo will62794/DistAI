@@ -1,0 +1,47 @@
+#lang ivy1.7
+
+# Source: https://github.com/sat-group/cfg-enum/blob/master/examples/quorum-leader-election.ivy
+
+type node
+type nset
+
+relation isleader(N:node)
+relation voted(N:node, M:node)
+relation member(N: node, Q: nset)
+relation majority(N:nset)
+individual quorum : nset
+
+axiom majority(S) & majority(Y) -> exists N . member(N, S) & member(N, T)
+
+after init {
+	voted(N, M) := false;
+	isleader(N) := false;
+}
+
+action vote(v : node , n : node) = {
+    require (forall M:node . ~voted(v, M));
+    voted(v, n) := true;
+}
+
+action become_leader(n : node , s : nset) = {
+	require majority(s);
+	require forall M:node . member(M, s) -> voted(M, n);
+	isleader(n) := true;
+	quorum := s;
+}
+
+export vote
+export become_leader
+
+invariant [1000000] (isleader(N) & isleader(M)) -> N = M
+#invariant voted(N,M) & voted(N,O) -> M = O
+#invariant isleader(N) -> (majority(quorum) & (member(M,quorum) -> voted(M, N)))
+
+invariant [1000] forall NO1:node, NO2:node, NS1:nset. NO1 ~= NO2 -> ~isleader(NO1) | ~isleader(NO2)
+invariant [1001] forall NO1:node, NO2:node, NS1:nset. NO1 ~= NO2 -> voted(NO1,NO2) | ~isleader(NO2) | ~member(NO1,NS1) | ~quorum=NS1
+invariant [1002] forall NO1:node, NO2:node, NS1:nset. NO1 ~= NO2 -> ~isleader(NO1) | ~voted(NO2,NO2) | ~member(NO2,NS1) | ~quorum=NS1
+invariant [1003] forall NO1:node, NO2:node, NS1:nset. NO1 ~= NO2 -> ~isleader(NO1) | ~voted(NO1,NO2) | ~member(NO1,NS1) | ~quorum=NS1
+invariant [1004] forall NO1:node, NO2:node, NS1:nset. NO1 ~= NO2 -> ~voted(NO1,NO1) | ~voted(NO1,NO2)
+invariant [2000] forall NO1:node, NS1:nset. voted(NO1,NO1) | ~isleader(NO1) | ~member(NO1,NS1) | ~quorum=NS1
+invariant [2001] forall NO1:node, NS1:nset. majority(NS1) | ~isleader(NO1) | ~quorum=NS1
+invariant [3000] forall NO1:node, NO2:node, NO3:node. NO2 ~= NO3 -> ~voted(NO1,NO2) | ~voted(NO1,NO3)

@@ -1,0 +1,3 @@
+same-type: node: N1, N2
+max-literal: 3
+safety-property: holds_lock(X) & holds_lock(Y) -> X = Y

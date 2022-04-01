@@ -1,0 +1,6 @@
+same-type: node: N1, N2, N3, N4
+max-literal: 3
+safety-property: forall T, X. table(T,X,X)
+safety-property: forall T, X, Y, Z. table(T,X,Y) & table(T,Y,Z) -> table(T,X,Z)
+safety-property: forall T, X, Y. table(T,X,Y) & table(T,Y,X) -> X = Y
+safety-property: forall T, X, Y, Z. table(T,X,Y) & table(T,X,Z) -> table(T,Y,Z) | table(T,Z,Y)

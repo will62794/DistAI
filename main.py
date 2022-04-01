@@ -27,13 +27,13 @@ if __name__ == '__main__':
         if i > 0:
             print('Re-simulate protocol with larger instances')
         start_time = time.time()
-        subprocret = subprocess.run(['python', 'translate.py', PROBLEM, '--num_attempt={}'.format(i)], cwd='src-py/')
+        subprocret = subprocess.run(['python3', 'translate.py', PROBLEM, '--num_attempt={}'.format(i)], cwd='src-py/')
         if subprocret.returncode != 0:
             print('translate.py fails to parse and translate the input Ivy file. Please use $ivy_check PROTOCOL.ivy to '
                   'check if the Ivy file has the correct syntax and grammar. If it does, the problem may come from the '
                   'limitation of DistAI, which does not support all Ivy features. Exiting...')
             exit(-1)
-        subprocess.run(['python', '{}.py'.format(PROBLEM)], cwd='auto_samplers/', check=True)
+        subprocess.run(['python3', '{}.py'.format(PROBLEM)], cwd='auto_samplers/', check=True)
         end_time = time.time()
         simulation_time += end_time - start_time
         if i == 0:

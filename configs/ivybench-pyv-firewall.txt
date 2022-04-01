@@ -1,0 +1,3 @@
+same-type: node: N1, N2
+max-literal: 3
+safety-property: sent(S,D) & internal(D) -> exists I. internal(I) & sent(I,S)

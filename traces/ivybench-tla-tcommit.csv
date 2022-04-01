@@ -1,0 +1,5 @@
+working(R1),prepared(R1),committed(R1),aborted(R1)
+0,0,0,1
+0,1,0,0
+1,0,0,0
+0,0,1,0

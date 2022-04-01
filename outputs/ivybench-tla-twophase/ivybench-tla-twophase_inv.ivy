@@ -1,0 +1,406 @@
+#lang ivy1.7
+
+type resource_manager
+
+relation working(R:resource_manager)
+relation prepared(R:resource_manager)
+relation committed(R:resource_manager)
+relation aborted(R:resource_manager)
+
+relation tm_init
+relation tm_committed
+relation tm_aborted
+relation tm_prepared(R:resource_manager)
+
+relation msg_prepared(R:resource_manager)
+relation msg_commit
+relation msg_abort
+
+after init {
+	working(R) := true;
+	prepared(R) := false;
+	committed(R) := false;
+	aborted(R) := false;
+	
+	tm_init := true;
+	tm_committed := false;
+	tm_aborted := false;
+	tm_prepared(R) := false;
+	
+	msg_prepared(R) := false;
+	msg_commit := false;
+	msg_abort := false;
+}
+
+action tMRcvPrepared(rm:resource_manager) = {
+	require tm_init;
+	require msg_prepared(rm);
+	tm_prepared(rm) := true;
+}
+
+action tMCommit = {
+	require tm_init;
+	require forall R. tm_prepared(R);
+	tm_init := false;
+	tm_committed := true;
+	tm_aborted := false;
+	msg_commit := true;
+}
+
+action tMAbort = {
+	require tm_init;
+	tm_init := false;
+	tm_committed := false;
+	tm_aborted := true;
+	msg_abort := true;
+}
+
+action rMPrepare(rm:resource_manager) = {
+	require working(rm);
+	working(rm) := false;
+	prepared(rm) := true;
+	committed(rm) := false;
+	aborted(rm) := false;
+	msg_prepared(rm) := true;
+}
+
+action rMChooseToAbort(rm:resource_manager) = {
+	require working(rm);
+	working(rm) := false;
+	prepared(rm) := false;
+	committed(rm) := false;
+	aborted(rm) := true;
+}
+
+action rMRcvCommitMsg(rm:resource_manager) = {
+	require msg_commit;
+	working(rm) := false;
+	prepared(rm) := false;
+	committed(rm) := true;
+	aborted(rm) := false;
+}
+
+action rMRcvAbortMsg(rm:resource_manager) = {
+	require msg_abort;
+	working(rm) := false;
+	prepared(rm) := false;
+	committed(rm) := false;
+	aborted(rm) := true;
+}
+
+export tMRcvPrepared
+export tMCommit
+export tMAbort
+
+export rMPrepare
+export rMChooseToAbort
+export rMRcvCommitMsg
+export rMRcvAbortMsg
+
+invariant [1000000] (forall R1, R2. ~(aborted(R1) & committed(R2)) )
+
+invariant [1000] forall R1:resource_manager. ~committed(R1) | ~msg_commit | ~msg_abort
+invariant [1001] forall R1:resource_manager. ~committed(R1) | ~tm_init | ~msg_commit
+invariant [1002] forall R1:resource_manager. ~working(R1) | ~committed(R1) | ~msg_commit
+invariant [1003] forall R1:resource_manager. msg_prepared(R1) | ~committed(R1) | ~msg_commit
+invariant [1004] forall R1:resource_manager. ~committed(R1) | ~tm_prepared(R1) | ~tm_aborted
+invariant [1005] forall R1:resource_manager. tm_committed | ~committed(R1) | ~tm_prepared(R1)
+invariant [1006] forall R1:resource_manager. msg_prepared(R1) | ~committed(R1) | ~tm_prepared(R1)
+invariant [1007] forall R1:resource_manager. tm_init | ~committed(R1) | ~aborted(R1)
+invariant [1008] forall R1:resource_manager. tm_init | ~working(R1) | ~committed(R1)
+invariant [1009] forall R1:resource_manager. tm_init | msg_commit | ~committed(R1)
+invariant [1010] forall R1:resource_manager. working(R1) | ~committed(R1) | ~msg_abort
+invariant [1011] forall R1:resource_manager. working(R1) | ~committed(R1) | ~aborted(R1)
+invariant [1012] forall R1:resource_manager. working(R1) | ~prepared(R1) | ~committed(R1)
+invariant [1013] forall R1:resource_manager. working(R1) | tm_committed | ~committed(R1)
+invariant [1014] forall R1:resource_manager. working(R1) | msg_prepared(R1) | ~committed(R1)
+invariant [1015] forall R1:resource_manager. prepared(R1) | ~committed(R1) | ~tm_init
+invariant [1016] forall R1:resource_manager. prepared(R1) | ~committed(R1) | ~aborted(R1)
+invariant [1017] forall R1:resource_manager. prepared(R1) | ~working(R1) | ~committed(R1)
+invariant [1018] forall R1:resource_manager. prepared(R1) | msg_commit | ~committed(R1)
+invariant [1019] forall R1:resource_manager. prepared(R1) | msg_prepared(R1) | ~committed(R1)
+invariant [1020] forall R1:resource_manager. prepared(R1) | tm_prepared(R1) | ~committed(R1)
+invariant [1021] forall R1:resource_manager. aborted(R1) | ~committed(R1) | ~tm_aborted
+invariant [1022] forall R1:resource_manager. aborted(R1) | tm_committed | ~committed(R1)
+invariant [1023] forall R1:resource_manager. aborted(R1) | msg_prepared(R1) | ~committed(R1)
+invariant [1024] forall R1:resource_manager. tm_aborted | ~committed(R1) | ~tm_init
+invariant [1025] forall R1:resource_manager. tm_aborted | ~prepared(R1) | ~committed(R1)
+invariant [1026] forall R1:resource_manager. tm_committed | tm_aborted | ~committed(R1)
+invariant [1027] forall R1:resource_manager. working(R1) | ~committed(R1) | ~tm_init
+invariant [1028] forall R1:resource_manager. msg_prepared(R1) | tm_aborted | ~committed(R1)
+invariant [1029] forall R1:resource_manager. tm_prepared(R1) | tm_aborted | ~committed(R1)
+invariant [1030] forall R1:resource_manager. aborted(R1) | ~working(R1) | ~committed(R1)
+invariant [1031] forall R1:resource_manager. msg_abort | ~committed(R1) | ~aborted(R1)
+invariant [1032] forall R1:resource_manager. ~committed(R1) | ~tm_prepared(R1) | ~msg_abort
+invariant [1033] forall R1:resource_manager. msg_abort | ~prepared(R1) | ~committed(R1)
+invariant [1034] forall R1:resource_manager. msg_abort | ~working(R1) | ~committed(R1)
+invariant [1035] forall R1:resource_manager. msg_abort | ~committed(R1) | ~tm_aborted
+invariant [1036] forall R1:resource_manager. tm_committed | msg_abort | ~committed(R1)
+invariant [1037] forall R1:resource_manager. tm_prepared(R1) | msg_abort | ~committed(R1)
+invariant [1038] forall R1:resource_manager. ~committed(R1) | ~msg_prepared(R1) | ~tm_init
+invariant [1039] forall R1:resource_manager. ~prepared(R1) | ~committed(R1) | ~msg_prepared(R1)
+invariant [1040] forall R1:resource_manager. aborted(R1) | tm_prepared(R1) | ~committed(R1)
+invariant [1041] forall R1:resource_manager. ~working(R1) | ~committed(R1) | ~msg_prepared(R1)
+invariant [1042] forall R1:resource_manager. tm_committed | ~committed(R1) | ~msg_prepared(R1)
+invariant [1043] forall R1:resource_manager. tm_prepared(R1) | ~committed(R1) | ~msg_commit
+invariant [1044] forall R1:resource_manager. aborted(R1) | ~committed(R1) | ~msg_abort
+invariant [1045] forall R1:resource_manager. msg_abort | ~committed(R1) | ~tm_init
+invariant [1046] forall R1:resource_manager. tm_prepared(R1) | ~committed(R1) | ~msg_prepared(R1)
+invariant [1047] forall R1:resource_manager. ~committed(R1) | ~tm_committed | ~tm_aborted
+invariant [1048] forall R1:resource_manager. ~committed(R1) | ~aborted(R1) | ~tm_committed
+invariant [1049] forall R1:resource_manager. msg_prepared(R1) | ~committed(R1) | ~tm_committed
+invariant [1050] forall R1:resource_manager. tm_prepared(R1) | ~committed(R1) | ~tm_committed
+invariant [1051] forall R1:resource_manager. prepared(R1) | ~msg_commit | ~msg_abort
+invariant [1052] forall R1:resource_manager. prepared(R1) | ~tm_aborted | ~msg_commit
+invariant [1053] forall R1:resource_manager. tm_aborted | ~committed(R1) | ~msg_abort
+invariant [1054] forall R1:resource_manager. prepared(R1) | ~working(R1) | ~msg_commit
+invariant [1055] forall R1:resource_manager. prepared(R1) | tm_prepared(R1) | ~msg_commit
+invariant [1056] forall R1:resource_manager. ~committed(R1) | ~tm_aborted
+invariant [1057] forall R1:resource_manager. ~committed(R1) | ~aborted(R1)
+invariant [1058] forall R1:resource_manager. msg_commit | ~committed(R1)
+invariant [1059] forall R1:resource_manager. msg_prepared(R1) | ~committed(R1)
+invariant [1060] forall R1:resource_manager. tm_prepared(R1) | ~committed(R1)
+invariant [1061] forall R1:resource_manager. aborted(R1) | ~prepared(R1) | ~committed(R1)
+invariant [1062] forall R1:resource_manager. prepared(R1) | ~tm_committed | ~tm_aborted
+invariant [1063] forall R1:resource_manager. prepared(R1) | ~aborted(R1) | ~tm_committed
+invariant [1064] forall R1:resource_manager. aborted(R1) | ~committed(R1) | ~tm_init
+invariant [1065] forall R1:resource_manager. prepared(R1) | msg_commit | ~tm_committed
+invariant [1066] forall R1:resource_manager. aborted(R1) | msg_commit | ~committed(R1)
+invariant [1067] forall R1:resource_manager. prepared(R1) | msg_prepared(R1) | ~tm_committed
+invariant [1068] forall R1:resource_manager. prepared(R1) | ~committed(R1) | ~msg_abort
+invariant [1069] forall R1:resource_manager. ~committed(R1) | ~msg_prepared(R1) | ~tm_aborted
+invariant [1070] forall R1:resource_manager. working(R1) | ~msg_commit | ~msg_abort
+invariant [1071] forall R1:resource_manager. prepared(R1) | ~aborted(R1) | ~msg_commit
+invariant [1072] forall R1:resource_manager. working(R1) | ~tm_init | ~msg_commit
+invariant [1073] forall R1:resource_manager. tm_committed | ~committed(R1)
+invariant [1074] forall R1:resource_manager. working(R1) | ~aborted(R1) | ~msg_commit
+invariant [1075] forall R1:resource_manager. ~prepared(R1) | ~tm_committed | ~msg_abort
+invariant [1076] forall R1:resource_manager. ~prepared(R1) | ~tm_committed | ~tm_aborted
+invariant [1077] forall R1:resource_manager. ~prepared(R1) | ~tm_init | ~tm_committed
+invariant [1078] forall R1:resource_manager. ~prepared(R1) | ~aborted(R1) | ~tm_committed
+invariant [1079] forall R1:resource_manager. msg_commit | ~prepared(R1) | ~tm_committed
+invariant [1080] forall R1:resource_manager. msg_prepared(R1) | ~prepared(R1) | ~tm_committed
+invariant [1081] forall R1:resource_manager. ~committed(R1) | ~tm_init
+invariant [1082] forall R1:resource_manager. working(R1) | tm_prepared(R1) | ~msg_commit
+invariant [1083] forall R1:resource_manager. working(R1) | ~tm_init | ~tm_committed
+invariant [1084] forall R1:resource_manager. working(R1) | msg_commit | ~tm_committed
+invariant [1085] forall R1:resource_manager. prepared(R1) | tm_committed | ~committed(R1)
+invariant [1086] forall R1:resource_manager. working(R1) | msg_prepared(R1) | ~tm_committed
+invariant [1087] forall R1:resource_manager. working(R1) | tm_prepared(R1) | ~tm_committed
+invariant [1088] forall R1:resource_manager. ~committed(R1) | ~msg_abort
+invariant [1089] forall R1:resource_manager. ~tm_committed | ~msg_commit | ~msg_abort
+invariant [1090] forall R1:resource_manager. ~working(R1) | ~tm_committed | ~msg_commit
+invariant [1091] forall R1:resource_manager. msg_prepared(R1) | ~tm_committed | ~msg_commit
+invariant [1092] forall R1:resource_manager. ~committed(R1) | ~aborted(R1) | ~msg_commit
+invariant [1093] forall R1:resource_manager. tm_aborted | ~tm_committed | ~msg_abort
+invariant [1094] forall R1:resource_manager. tm_aborted | ~aborted(R1) | ~tm_committed
+invariant [1095] forall R1:resource_manager. msg_prepared(R1) | tm_aborted | ~tm_committed
+invariant [1096] forall R1:resource_manager. committed(R1) | ~tm_committed | ~msg_abort
+invariant [1097] forall R1:resource_manager. committed(R1) | ~tm_committed | ~tm_aborted
+invariant [1098] forall R1:resource_manager. committed(R1) | ~tm_init | ~tm_committed
+invariant [1099] forall R1:resource_manager. committed(R1) | ~working(R1) | ~tm_committed
+invariant [1100] forall R1:resource_manager. committed(R1) | msg_commit | ~tm_committed
+invariant [1101] forall R1:resource_manager. ~working(R1) | ~committed(R1)
+invariant [1102] forall R1:resource_manager. committed(R1) | msg_prepared(R1) | ~tm_committed
+invariant [1103] forall R1:resource_manager. ~prepared(R1) | ~committed(R1) | ~tm_committed
+invariant [1104] forall R1:resource_manager. prepared(R1) | committed(R1) | ~tm_committed
+invariant [1105] forall R1:resource_manager. working(R1) | msg_prepared(R1) | ~msg_commit
+invariant [1106] forall R1:resource_manager. aborted(R1) | ~working(R1) | ~msg_commit
+invariant [1107] forall R1:resource_manager. ~committed(R1) | ~tm_committed | ~msg_abort
+invariant [1108] forall R1:resource_manager. aborted(R1) | tm_committed | ~msg_commit
+invariant [1109] forall R1:resource_manager. aborted(R1) | msg_prepared(R1) | ~msg_commit
+invariant [1110] forall R1:resource_manager. aborted(R1) | tm_prepared(R1) | ~msg_commit
+invariant [1111] forall R1:resource_manager. aborted(R1) | ~tm_committed | ~msg_abort
+invariant [1112] forall R1:resource_manager. aborted(R1) | ~tm_committed | ~tm_aborted
+invariant [1113] forall R1:resource_manager. aborted(R1) | ~tm_init | ~tm_committed
+invariant [1114] forall R1:resource_manager. aborted(R1) | msg_prepared(R1) | ~tm_committed
+invariant [1115] forall R1:resource_manager. tm_init | ~tm_committed | ~msg_abort
+invariant [1116] forall R1:resource_manager. tm_aborted | msg_commit | ~committed(R1)
+invariant [1117] forall R1:resource_manager. tm_init | ~tm_committed | ~tm_aborted
+invariant [1118] forall R1:resource_manager. ~committed(R1) | ~tm_prepared(R1) | ~tm_init
+invariant [1119] forall R1:resource_manager. tm_init | ~aborted(R1) | ~tm_committed
+invariant [1120] forall R1:resource_manager. aborted(R1) | ~msg_commit | ~msg_abort
+invariant [1121] forall R1:resource_manager. tm_init | ~working(R1) | ~tm_committed
+invariant [1122] forall R1:resource_manager. tm_init | ~committed(R1) | ~msg_abort
+invariant [1123] forall R1:resource_manager. tm_init | msg_commit | ~tm_committed
+invariant [1124] forall R1:resource_manager. tm_prepared(R1) | tm_init | ~committed(R1)
+invariant [1125] forall R1:resource_manager. msg_prepared(R1) | tm_init | ~tm_committed
+invariant [1126] forall R1:resource_manager. tm_init | ~prepared(R1) | ~committed(R1)
+invariant [1127] forall R1:resource_manager. tm_prepared(R1) | tm_init | ~tm_committed
+invariant [1128] forall R1:resource_manager. ~msg_prepared(R1) | ~tm_committed | ~msg_abort
+invariant [1129] forall R1:resource_manager. ~msg_prepared(R1) | ~tm_committed | ~tm_aborted
+invariant [1130] forall R1:resource_manager. ~msg_prepared(R1) | ~tm_init | ~tm_committed
+invariant [1131] forall R1:resource_manager. ~aborted(R1) | ~msg_prepared(R1) | ~tm_committed
+invariant [1132] forall R1:resource_manager. ~working(R1) | ~msg_prepared(R1) | ~tm_committed
+invariant [1133] forall R1:resource_manager. ~working(R1) | ~committed(R1) | ~tm_prepared(R1)
+invariant [1134] forall R1:resource_manager. tm_prepared(R1) | ~msg_prepared(R1) | ~tm_committed
+invariant [1135] forall R1:resource_manager. ~tm_prepared(R1) | ~msg_commit | ~msg_abort
+invariant [1136] forall R1:resource_manager. ~prepared(R1) | ~committed(R1)
+invariant [1137] forall R1:resource_manager. ~aborted(R1) | ~tm_prepared(R1) | ~msg_commit
+invariant [1138] forall R1:resource_manager. tm_committed | ~tm_prepared(R1) | ~msg_commit
+invariant [1139] forall R1:resource_manager. prepared(R1) | ~committed(R1) | ~tm_aborted
+invariant [1140] forall R1:resource_manager. msg_prepared(R1) | ~tm_prepared(R1) | ~msg_commit
+invariant [1141] forall R1:resource_manager. committed(R1) | ~tm_aborted | ~msg_commit
+invariant [1142] forall R1:resource_manager. ~prepared(R1) | ~aborted(R1) | ~msg_commit
+invariant [1143] forall R1:resource_manager. tm_prepared(R1) | tm_aborted | ~msg_commit
+invariant [1144] forall R1:resource_manager. committed(R1) | ~working(R1) | ~msg_commit
+invariant [1145] forall R1:resource_manager. msg_prepared(R1) | tm_aborted | ~msg_commit
+invariant [1146] forall R1:resource_manager. committed(R1) | tm_prepared(R1) | ~msg_commit
+invariant [1147] forall R1:resource_manager. msg_prepared(R1) | msg_abort | ~tm_committed
+invariant [1148] forall R1:resource_manager. tm_prepared(R1) | msg_abort | ~tm_committed
+invariant [1149] forall R1:resource_manager. ~committed(R1) | ~aborted(R1) | ~tm_prepared(R1)
+invariant [1150] forall R1:resource_manager. working(R1) | ~tm_committed | ~msg_abort
+invariant [1151] forall R1:resource_manager. tm_init | ~working(R1) | ~msg_commit
+invariant [1152] forall R1:resource_manager. tm_aborted | ~tm_init | ~tm_committed
+invariant [1153] forall R1:resource_manager. msg_abort | ~aborted(R1) | ~tm_prepared(R1)
+invariant [1154] forall R1:resource_manager. msg_prepared(R1) | tm_init | ~msg_commit
+invariant [1155] forall R1:resource_manager. ~prepared(R1) | ~aborted(R1)
+invariant [1156] forall R1:resource_manager. tm_prepared(R1) | tm_init | ~msg_commit
+invariant [1157] forall R1:resource_manager. ~working(R1) | ~prepared(R1)
+invariant [1158] forall R1:resource_manager. tm_aborted | msg_commit | ~tm_committed
+invariant [1159] forall R1:resource_manager. committed(R1) | ~aborted(R1) | ~tm_committed
+invariant [1160] forall R1:resource_manager. committed(R1) | msg_prepared(R1) | ~msg_commit
+invariant [1161] forall R1:resource_manager. aborted(R1) | ~working(R1) | ~tm_committed
+invariant [1162] forall R1:resource_manager. tm_aborted | ~tm_init | ~msg_commit
+invariant [1163] forall R1:resource_manager. prepared(R1) | committed(R1) | ~msg_commit
+invariant [1164] forall R1:resource_manager. tm_aborted | ~aborted(R1) | ~msg_commit
+invariant [1165] forall R1:resource_manager. tm_init | ~aborted(R1) | ~msg_commit
+invariant [1166] forall R1:resource_manager. msg_commit | ~committed(R1) | ~tm_prepared(R1)
+invariant [1167] forall R1:resource_manager. committed(R1) | ~aborted(R1) | ~msg_commit
+invariant [1168] forall R1:resource_manager. tm_aborted | ~working(R1) | ~msg_commit
+invariant [1169] forall R1:resource_manager. msg_abort | ~tm_aborted | ~msg_commit
+invariant [1170] forall R1:resource_manager. tm_init | tm_committed | ~msg_commit
+invariant [1171] forall R1:resource_manager. tm_aborted | ~working(R1) | ~tm_committed
+invariant [1172] forall R1:resource_manager. tm_init | msg_abort | ~aborted(R1)
+invariant [1173] forall R1:resource_manager. tm_aborted | ~msg_commit | ~msg_abort
+invariant [1174] forall R1:resource_manager. msg_abort | ~working(R1) | ~msg_commit
+invariant [1175] forall R1:resource_manager. msg_prepared(R1) | ~msg_commit
+invariant [1176] forall R1:resource_manager. msg_abort | ~aborted(R1) | ~tm_committed
+invariant [1177] forall R1:resource_manager. msg_prepared(R1) | msg_abort | ~committed(R1)
+invariant [1178] forall R1:resource_manager. ~working(R1) | ~committed(R1) | ~tm_committed
+invariant [1179] forall R1:resource_manager. ~prepared(R1) | ~tm_aborted | ~msg_commit
+invariant [1180] forall R1:resource_manager. ~tm_init | ~tm_committed | ~msg_commit
+invariant [1181] forall R1:resource_manager. ~prepared(R1) | ~tm_init | ~msg_commit
+invariant [1182] forall R1:resource_manager. msg_abort | ~aborted(R1) | ~msg_prepared(R1)
+invariant [1183] forall R1:resource_manager. tm_init | tm_committed | ~committed(R1)
+invariant [1184] forall R1:resource_manager. ~working(R1) | ~prepared(R1) | ~msg_commit
+invariant [1185] forall R1:resource_manager. tm_init | msg_commit | msg_abort
+invariant [1186] forall R1:resource_manager. working(R1) | ~aborted(R1) | ~tm_committed
+invariant [1187] forall R1:resource_manager. ~tm_prepared(R1) | ~tm_committed | ~tm_aborted
+invariant [1188] forall R1:resource_manager. tm_committed | ~prepared(R1) | ~msg_commit
+invariant [1189] forall R1:resource_manager. msg_prepared(R1) | ~prepared(R1) | ~msg_commit
+invariant [1190] forall R1:resource_manager. committed(R1) | ~msg_commit | ~msg_abort
+invariant [1191] forall R1:resource_manager. ~msg_prepared(R1) | ~msg_commit | ~msg_abort
+invariant [1192] forall R1:resource_manager. msg_commit | msg_abort | ~tm_committed
+invariant [1193] forall R1:resource_manager. ~msg_prepared(R1) | ~tm_aborted | ~msg_commit
+invariant [1194] forall R1:resource_manager. tm_aborted | ~working(R1) | ~committed(R1)
+invariant [1195] forall R1:resource_manager. tm_init | ~msg_commit | ~msg_abort
+invariant [1196] forall R1:resource_manager. ~msg_prepared(R1) | ~tm_init | ~msg_commit
+invariant [1197] forall R1:resource_manager. tm_committed | msg_abort | ~msg_commit
+invariant [1198] forall R1:resource_manager. committed(R1) | tm_prepared(R1) | ~tm_committed
+invariant [1199] forall R1:resource_manager. ~aborted(R1) | ~msg_prepared(R1) | ~msg_commit
+invariant [1200] forall R1:resource_manager. aborted(R1) | ~tm_init | ~msg_commit
+invariant [1201] forall R1:resource_manager. aborted(R1) | ~tm_aborted | ~msg_commit
+invariant [1202] forall R1:resource_manager. ~working(R1) | ~msg_prepared(R1) | ~msg_commit
+invariant [1203] forall R1:resource_manager. tm_committed | ~msg_prepared(R1) | ~msg_commit
+invariant [1204] forall R1:resource_manager. msg_abort | ~aborted(R1) | ~msg_commit
+invariant [1205] forall R1:resource_manager. tm_prepared(R1) | ~msg_prepared(R1) | ~msg_commit
+invariant [1206] forall R1:resource_manager. working(R1) | msg_commit | ~committed(R1)
+invariant [1207] forall R1:resource_manager. working(R1) | ~tm_aborted | ~msg_commit
+invariant [1208] forall R1:resource_manager. aborted(R1) | tm_prepared(R1) | ~tm_committed
+invariant [1209] forall R1:resource_manager. tm_committed | ~msg_commit
+invariant [1210] forall R1:resource_manager. tm_aborted | ~aborted(R1) | ~tm_prepared(R1)
+invariant [1211] forall R1:resource_manager. ~tm_prepared(R1) | ~tm_committed | ~msg_abort
+invariant [1212] forall R1:resource_manager. working(R1) | tm_prepared(R1) | ~committed(R1)
+invariant [1213] forall R1:resource_manager. msg_commit | msg_abort | ~committed(R1)
+invariant [1214] forall R1:resource_manager. ~tm_prepared(R1) | ~tm_init | ~msg_commit
+invariant [1215] forall R1:resource_manager. tm_prepared(R1) | ~tm_committed
+invariant [1216] forall R1:resource_manager. ~tm_prepared(R1) | ~tm_init | ~tm_committed
+invariant [1217] forall R1:resource_manager. committed(R1) | tm_committed | ~msg_commit
+invariant [1218] forall R1:resource_manager. ~working(R1) | ~prepared(R1) | ~tm_committed
+invariant [1219] forall R1:resource_manager. ~aborted(R1) | ~tm_committed
+invariant [1220] forall R1:resource_manager. tm_committed | tm_aborted | ~msg_commit
+invariant [1221] forall R1:resource_manager. ~working(R1) | ~tm_prepared(R1)
+invariant [1222] forall R1:resource_manager. ~working(R1) | ~tm_prepared(R1) | ~tm_committed
+invariant [1223] forall R1:resource_manager. ~committed(R1) | ~tm_aborted | ~msg_commit
+invariant [1224] forall R1:resource_manager. msg_commit | ~tm_prepared(R1) | ~tm_committed
+invariant [1225] forall R1:resource_manager. working(R1) | ~tm_committed | ~tm_aborted
+invariant [1226] forall R1:resource_manager. ~msg_commit | ~msg_abort
+invariant [1227] forall R1:resource_manager. msg_prepared(R1) | ~tm_prepared(R1) | ~tm_committed
+invariant [1228] forall R1:resource_manager. prepared(R1) | ~tm_init | ~msg_commit
+invariant [1229] forall R1:resource_manager. msg_prepared(R1) | ~prepared(R1)
+invariant [1230] forall R1:resource_manager. tm_init | msg_abort | ~tm_aborted
+invariant [1231] forall R1:resource_manager. msg_commit | ~committed(R1) | ~msg_prepared(R1)
+invariant [1232] forall R1:resource_manager. msg_prepared(R1) | msg_abort | ~msg_commit
+invariant [1233] forall R1:resource_manager. tm_init | msg_abort | ~working(R1)
+invariant [1234] forall R1:resource_manager. tm_init | tm_committed | msg_abort
+invariant [1235] forall R1:resource_manager. tm_init | tm_aborted | ~msg_abort
+invariant [1236] forall R1:resource_manager. msg_commit | ~tm_committed
+invariant [1237] forall R1:resource_manager. working(R1) | ~committed(R1) | ~tm_aborted
+invariant [1238] forall R1:resource_manager. ~tm_prepared(R1) | ~tm_aborted | ~msg_commit
+invariant [1239] forall R1:resource_manager. tm_init | tm_aborted | ~working(R1)
+invariant [1240] forall R1:resource_manager. ~aborted(R1) | ~tm_prepared(R1) | ~tm_committed
+invariant [1241] forall R1:resource_manager. tm_init | tm_aborted | msg_commit
+invariant [1242] forall R1:resource_manager. tm_init | tm_committed | tm_aborted
+invariant [1243] forall R1:resource_manager. tm_aborted | ~committed(R1) | ~aborted(R1)
+invariant [1244] forall R1:resource_manager. tm_prepared(R1) | tm_aborted | ~tm_committed
+invariant [1245] forall R1:resource_manager. tm_prepared(R1) | tm_init | tm_aborted
+invariant [1246] forall R1:resource_manager. msg_prepared(R1) | tm_init | msg_abort
+invariant [1247] forall R1:resource_manager. tm_aborted | ~aborted(R1) | ~msg_prepared(R1)
+invariant [1248] forall R1:resource_manager. ~committed(R1) | ~tm_init | ~tm_committed
+invariant [1249] forall R1:resource_manager. ~tm_aborted | ~msg_commit
+invariant [1250] forall R1:resource_manager. tm_init | ~tm_aborted | ~msg_commit
+invariant [1251] forall R1:resource_manager. ~committed(R1) | ~aborted(R1) | ~msg_prepared(R1)
+invariant [1252] forall R1:resource_manager. ~prepared(R1) | ~msg_commit | ~msg_abort
+invariant [1253] forall R1:resource_manager. tm_committed | ~committed(R1) | ~msg_commit
+invariant [1254] forall R1:resource_manager. tm_init | tm_aborted | ~aborted(R1)
+invariant [1255] forall R1:resource_manager. ~tm_init | ~msg_commit
+invariant [1256] forall R1:resource_manager. msg_abort | ~tm_init | ~tm_committed
+invariant [1257] forall R1:resource_manager. ~aborted(R1) | ~tm_committed | ~msg_commit
+invariant [1258] forall R1:resource_manager. tm_prepared(R1) | ~tm_committed | ~msg_commit
+invariant [1259] forall R1:resource_manager. ~tm_init | ~msg_abort
+invariant [1260] forall R1:resource_manager. prepared(R1) | tm_committed | ~msg_commit
+invariant [1261] forall R1:resource_manager. committed(R1) | ~tm_init | ~msg_commit
+invariant [1262] forall R1:resource_manager. tm_aborted | ~msg_abort
+invariant [1263] forall R1:resource_manager. tm_prepared(R1) | ~prepared(R1) | ~msg_commit
+invariant [1264] forall R1:resource_manager. ~working(R1) | ~msg_commit
+invariant [1265] forall R1:resource_manager. working(R1) | tm_committed | ~msg_commit
+invariant [1266] forall R1:resource_manager. tm_prepared(R1) | ~msg_commit
+invariant [1267] forall R1:resource_manager. ~aborted(R1) | ~tm_prepared(R1) | ~tm_init
+invariant [1268] forall R1:resource_manager. working(R1) | aborted(R1) | msg_prepared(R1)
+invariant [1269] forall R1:resource_manager. tm_init | ~committed(R1) | ~tm_aborted
+invariant [1270] forall R1:resource_manager. prepared(R1) | msg_prepared(R1) | ~msg_commit
+invariant [1271] forall R1:resource_manager. ~tm_committed | ~msg_abort
+invariant [1272] forall R1:resource_manager. msg_abort | ~tm_committed | ~tm_aborted
+invariant [1273] forall R1:resource_manager. msg_commit | ~committed(R1) | ~tm_committed
+invariant [1274] forall R1:resource_manager. ~tm_committed | ~tm_aborted
+invariant [1275] forall R1:resource_manager. ~working(R1) | ~tm_prepared(R1) | ~msg_commit
+invariant [1276] forall R1:resource_manager. ~tm_init | ~tm_committed
+invariant [1277] forall R1:resource_manager. prepared(R1) | ~tm_committed | ~msg_abort
+invariant [1278] forall R1:resource_manager. prepared(R1) | ~msg_prepared(R1) | ~tm_init
+invariant [1279] forall R1:resource_manager. aborted(R1) | msg_commit | ~tm_committed
+invariant [1280] forall R1:resource_manager. msg_abort | ~tm_aborted
+invariant [1281] forall R1:resource_manager. prepared(R1) | ~tm_init | ~tm_committed
+invariant [1282] forall R1:resource_manager. msg_prepared(R1) | ~tm_committed
+invariant [1283] forall R1:resource_manager. tm_prepared(R1) | msg_abort | ~msg_commit
+invariant [1284] forall R1:resource_manager. ~committed(R1) | ~msg_prepared(R1) | ~msg_abort
+invariant [1285] forall R1:resource_manager. ~aborted(R1) | ~msg_commit
+invariant [1286] forall R1:resource_manager. prepared(R1) | tm_prepared(R1) | ~tm_committed
+invariant [1287] forall R1:resource_manager. ~working(R1) | ~msg_prepared(R1)
+invariant [1288] forall R1:resource_manager. tm_prepared(R1) | ~prepared(R1) | ~tm_committed
+invariant [1289] forall R1:resource_manager. ~working(R1) | ~tm_committed
+invariant [1290] forall R1:resource_manager. ~prepared(R1) | ~committed(R1) | ~tm_prepared(R1)
+invariant [1291] forall R1:resource_manager. msg_prepared(R1) | tm_init | tm_aborted
+invariant [1292] forall R1:resource_manager. msg_abort | ~tm_init | ~msg_commit
+invariant [1293] forall R1:resource_manager. ~tm_committed | ~tm_aborted | ~msg_commit
+invariant [1294] forall R1:resource_manager. msg_prepared(R1) | ~tm_prepared(R1)
+invariant [1295] forall R1:resource_manager. prepared(R1) | ~tm_prepared(R1) | ~tm_init
+invariant [1296] forall R1:resource_manager. prepared(R1) | ~working(R1) | ~tm_committed
+invariant [1297] forall R1:resource_manager. ~aborted(R1) | ~msg_prepared(R1) | ~tm_init
+invariant [1298] forall R1:resource_manager. ~working(R1) | ~aborted(R1)
+invariant [1299] forall R1:resource_manager. ~prepared(R1) | ~committed(R1) | ~msg_commit
+invariant [1300] forall R1:resource_manager. msg_prepared(R1) | tm_init | ~committed(R1)
+invariant [1301] forall R1:resource_manager. tm_prepared(R1) | tm_init | msg_abort
+invariant [1302] forall R1:resource_manager. ~tm_init | ~tm_aborted
+invariant [1303] forall R1:resource_manager. msg_commit | ~msg_prepared(R1) | ~tm_committed
+invariant [1304] forall R1:resource_manager. msg_abort | ~working(R1) | ~tm_committed

@@ -3,18 +3,19 @@ from collections import defaultdict
 from scipy.special import comb
 import time
 import pandas as pd
-from itertools import product, permutations
+from itertools import product, permutations, combinations
 
 rng = np.random.default_rng(0)
+bool_num = 2
 
 def vote1_prec(n):
-	if not ((alive[n])):
+	if not (alive[n]):
 		return False
-	if not ((not vote_no[n])):
+	if not (not (vote_no[n])):
 		return False
-	if not ((not decide_commit[n])):
+	if not (not (decide_commit[n])):
 		return False
-	if not ((not decide_abort[n])):
+	if not (not (decide_abort[n])):
 		return False
 	return True
 
@@ -22,13 +23,13 @@ def vote1(n):
 	vote_yes[n] = True
 
 def vote2_prec(n):
-	if not ((alive[n])):
+	if not (alive[n]):
 		return False
-	if not ((not vote_yes[n])):
+	if not (not (vote_yes[n])):
 		return False
-	if not ((not decide_commit[n])):
+	if not (not (decide_commit[n])):
 		return False
-	if not ((not decide_abort[n])):
+	if not (not (decide_abort[n])):
 		return False
 	return True
 
@@ -38,7 +39,7 @@ def vote2(n):
 	decide_abort[n] = True
 
 def fail_prec(n):
-	if not ((alive[n])):
+	if not (alive[n]):
 		return False
 	return True
 
@@ -47,26 +48,11 @@ def fail(n):
 	abort_flag[0] = True
 
 def go1_prec():
-	tmp_var_1 = True
-	for N in range(node_num):
-		if not (not go_commit[N]):
-			tmp_var_1 = False
-			break
-	if not (tmp_var_1):
+	if not (forall_func_1(node_num, (lambda N : not (go_commit[N])))):
 		return False
-	tmp_var_2 = True
-	for N in range(node_num):
-		if not (not go_abort[N]):
-			tmp_var_2 = False
-			break
-	if not (tmp_var_2):
+	if not (forall_func_1(node_num, (lambda N : not (go_abort[N])))):
 		return False
-	tmp_var_3 = True
-	for N in range(node_num):
-		if not (vote_yes[N]):
-			tmp_var_3 = False
-			break
-	if not (tmp_var_3):
+	if not (forall_func_1(node_num, (lambda N : vote_yes[N]))):
 		return False
 	return True
 
@@ -75,26 +61,11 @@ def go1():
 		go_commit[N] = True
 
 def go2_prec():
-	tmp_var_4 = True
-	for N in range(node_num):
-		if not (not go_commit[N]):
-			tmp_var_4 = False
-			break
-	if not (tmp_var_4):
+	if not (forall_func_1(node_num, (lambda N : not (go_commit[N])))):
 		return False
-	tmp_var_5 = True
-	for N in range(node_num):
-		if not (not go_abort[N]):
-			tmp_var_5 = False
-			break
-	if not (tmp_var_5):
+	if not (forall_func_1(node_num, (lambda N : not (go_abort[N])))):
 		return False
-	tmp_var_6 = False
-	for N in range(node_num):
-		if (vote_no[N] or not alive[N]):
-			tmp_var_6 = True
-			break
-	if not (tmp_var_6):
+	if not (exists_func_1(node_num, (lambda N : (vote_no[N]) or (not (alive[N]))))):
 		return False
 	return True
 
@@ -103,9 +74,9 @@ def go2():
 		go_abort[N] = True
 
 def commit_prec(n):
-	if not ((alive[n])):
+	if not (alive[n]):
 		return False
-	if not ((go_commit[n])):
+	if not (go_commit[n]):
 		return False
 	return True
 
@@ -113,20 +84,36 @@ def commit(n):
 	decide_commit[n] = True
 
 def abort_prec(n):
-	if not ((alive[n])):
+	if not (alive[n]):
 		return False
-	if not ((go_abort[n])):
+	if not (go_abort[n]):
 		return False
 	return True
 
 def abort(n):
 	decide_abort[n] = True
 
+
+def forall_func_1(domain_size_1, func):
+	for x1 in range(domain_size_1):
+		if not func(x1):
+			return False
+	return True
+
+def exists_func_1(domain_size_1, func):
+	for x1 in range(domain_size_1):
+		if func(x1):
+			return True
+	return False
+
 func_from_name = {'vote1': vote1, 'vote1_prec': vote1_prec, 'vote2': vote2, 'vote2_prec': vote2_prec, 'fail': fail, 'fail_prec': fail_prec, 'go1': go1, 'go1_prec': go1_prec, 'go2': go2, 'go2_prec': go2_prec, 'commit': commit, 'commit_prec': commit_prec, 'abort': abort, 'abort_prec': abort_prec}
 
 def instance_generator():
 	node_num = rng.integers(2, 6)
 	return node_num
+
+def add_checked_candidates():
+	return
 
 def sample(max_iter=50):
 	global node_num, vote_yes, vote_no, alive, go_commit, go_abort, decide_commit, decide_abort, abort_flag
@@ -184,6 +171,15 @@ def sample(max_iter=50):
 		for n in range(node_num):
 			argument_pool['abort'].append((n,))
 
+		def collect_subsamples():
+			# generate subsamples from the current state (sample)
+			for k in range(3):
+				node_indices = rng.choice(list(range(node_num)), 2, replace=False)
+				node_indices = sorted(node_indices)
+				for N1, N2, in permutations(node_indices):
+					df_data.add((vote_yes[N1], vote_yes[N2], vote_no[N1], vote_no[N2], alive[N1], alive[N2], go_commit[N1], go_commit[N2], go_abort[N1], go_abort[N2], decide_commit[N1], decide_commit[N2], decide_abort[N1], decide_abort[N2], abort_flag[0]))
+
+		collect_subsamples()
 		for curr_iter in range(max_iter):
 			rng.shuffle(action_pool)
 			action_selected, args_selected = None, None
@@ -200,16 +196,12 @@ def sample(max_iter=50):
 				# action pool exhausted, start a new simulation
 				break
 			func_from_name[action_selected](*args_selected)
+			collect_subsamples()
 
-			# generate subsamples from the current state (sample)
-			for k in range(3):
-				node_indices = rng.choice(list(range(node_num)), 2, replace=False)
-				node_indices = sorted(node_indices)
-				for N1, N2, in permutations(node_indices):
-					df_data.add((vote_yes[N1], vote_yes[N2], vote_no[N1], vote_no[N2], alive[N1], alive[N2], go_commit[N1], go_commit[N2], go_abort[N1], go_abort[N2], decide_commit[N1], decide_commit[N2], decide_abort[N1], decide_abort[N2], abort_flag[0]))
 		simulation_round += 1
 		df_size_history.append(len(df_data))
 		stopping_criteria = simulation_round > 1000 or (simulation_round > 20 and df_size_history[-1] == df_size_history[-21])
+	add_checked_candidates()
 	return list(df_data)
 
 if __name__ == '__main__':
