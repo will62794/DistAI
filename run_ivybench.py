@@ -19,7 +19,7 @@ bms = [
     "pyv-learning-switch",
     "i4-chord-ring-maintenance",
     "pyv-sharded-kv-no-lost-keys",
-    "ex-naive-consensus",
+    # "ex-naive-consensus",
     "pyv-client-server-ae",
     "ex-simple-election",
     "pyv-toy-consensus-epr",
@@ -31,7 +31,7 @@ bms = [
     "pyv-consensus-epr"
 ]
 
-bms_to_run = bms[:8]
+bms_to_run = bms[:]
 results = []
 for ind,bm in enumerate(bms_to_run):
     msg = f"=== Running benchmark {ind+1}/{len(bms_to_run)}: '{bm}'"
@@ -45,7 +45,7 @@ for ind,bm in enumerate(bms_to_run):
     print(stdout)
     print("ret stderr", ret.stderr)
     print("ret stderr", bool(ret.stderr))
-    result = {"bmname": bm}
+    result = {"bmname": bm, "duration_secs": None, "ninvs": None}
 
     if "fails to parse" in stdout:
         result["duration_secs"]="error"
