@@ -77,7 +77,7 @@ def run_benchmark(PROBLEM):
                 refiner_log_lines = refiner_log_file.readlines()
         except FileNotFoundError:
             print("error, file not found:", c_runtime_path + '/refiner_log.txt')
-            return {"success": False}
+            return {"success": False, "other_error":True}
 
         for line in refiner_log_lines:
             if line.startswith('Success?'):
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     for r in results:
         if r["success"]:
             f.write(",".join([r["bmname"],str(r["duration_secs"]),str(r["ninvs"])]))
-        elif not r["success"] and "parse_error" in r:
+        elif not r["success"] and ("parse_error" in r or "other_error" in r):
             f.write(",".join([r["bmname"],"error","-"]))
         else:
             # No parse error but terminated without discovering an invariant.
