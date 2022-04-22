@@ -70,8 +70,14 @@ def run_benchmark(PROBLEM):
             subprocess.run(['./main', PROBLEM], cwd='src-c/')
         else:
             subprocess.run(['./main', PROBLEM, '--max_retry={}'.format(i)], cwd='src-c/')
-        with open(c_runtime_path + '/refiner_log.txt', 'r') as refiner_log_file:
-            refiner_log_lines = refiner_log_file.readlines()
+        refiner_log_lines = None
+        try:
+            with open(c_runtime_path + '/refiner_log.txt', 'r') as refiner_log_file:
+                refiner_log_lines = refiner_log_file.readlines()
+        except FileNotFoundError:
+            print("error, file not found:", c_runtime_path + '/refiner_log.txt')
+            return {"success": False}
+
         for line in refiner_log_lines:
             if line.startswith('Success?'):
                 if line[len('Success?') + 1:].strip() == 'Yes':
@@ -115,7 +121,7 @@ if __name__ == '__main__':
     for r in results:
         if r["success"]:
             f.write(",".join([r["bmname"],str(r["duration_secs"]),str(r["ninvs"])]))
-        elif not r["success"] and r["parse_error"]:
+        elif not r["success"] and "parse_error" in r:
             f.write(",".join([r["bmname"],"error","-"]))
         else:
             # No parse error but terminated without discovering an invariant.
