@@ -49,7 +49,7 @@ for ind,bm in enumerate(bms_to_run):
 
     if "fails to parse" in stdout:
         result["duration_secs"]="error"
-        result["ninvs"]=None
+        result["ninvs"]="-"
         results.append(result)
         continue
 
@@ -72,13 +72,13 @@ for ind,bm in enumerate(bms_to_run):
         for line in errlines:
             print(str(line))
         result["duration_secs"]="error"
-        result["ninvs"]=None
+        result["ninvs"]="-"
     results.append(result)
 for r in results:
     print(r)
 
 f = open("distai_ivybench_results.csv", 'w')
-f.write("bm,duration_secs,ninvs\n")
+f.write("protocol,duration_secs,invsize\n")
 for r in results:
     f.write(",".join([r["bmname"],str(r["duration_secs"]),str(r["ninvs"])]))
     f.write("\n")
