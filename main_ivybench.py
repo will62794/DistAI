@@ -24,7 +24,7 @@ bms = [
     "pyv-learning-switch",
     "i4-chord-ring-maintenance",
     "pyv-sharded-kv-no-lost-keys",
-    # "ex-naive-consensus",
+    "ex-naive-consensus",
     "pyv-client-server-ae",
     "ex-simple-election",
     "pyv-toy-consensus-epr",
@@ -97,7 +97,7 @@ def run_benchmark(PROBLEM):
         refinement_time = refinement_time / 1000
         total_time = simulation_time + enumeration_time + refinement_time 
 
-        result["duration_secs"] = total_time
+        result["duration_secs"] = int(total_time)
         result["ninvs"] = invariant_count + 1
     result["success"] = success
     return result
