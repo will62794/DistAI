@@ -33,7 +33,8 @@ bms = [
     "pyv-hybrid-reliable-broadcast",
     "pyv-firewall",
     "ex-majorityset-leader-election",
-    "pyv-consensus-epr"
+    "pyv-consensus-epr",
+    "mongo-logless-reconfig"
 ]
 
 PROBLEM = 'leader'
