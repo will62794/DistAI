@@ -6,7 +6,8 @@
 
 #define SAFETY_PROPERTY_ID 1000000
 //#define IVY_CHECK_PATH "/home/me/anaconda3/envs/py2/bin/ivy_check"  // change this to absolute path of ivy_check on your machine
-#define IVY_CHECK_PATH "/Library/Frameworks/Python.framework/Versions/2.7/bin/ivy_check"  // change this to absolute path of ivy_check on your machine
+// #define IVY_CHECK_PATH "/Library/Frameworks/Python.framework/Versions/2.7/bin/ivy_check"  // change this to absolute path of ivy_check on your machine
+#define IVY_CHECK_PATH "/usr/local/bin/ivy_check"
 
 #define BOOL_TO_STR(b) (b ? "Yes" : "No")
 
