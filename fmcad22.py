@@ -54,6 +54,7 @@ def run_benchmark(PROBLEM):
     shutil.rmtree(output_path, ignore_errors=True)
     os.mkdir(output_path)
     result = {}
+    TIMEOUT_SECS = 60 * 10
     for i in range(MAX_TEMPLATE_INCREASE):
         if i > 0:
             print('Re-simulate protocol with larger instances')
@@ -67,10 +68,14 @@ def run_benchmark(PROBLEM):
         subprocess.run(['python3', '{}.py'.format(PROBLEM)], cwd='auto_samplers/', check=True)
         end_time = time.time()
         simulation_time += end_time - start_time
-        if i == 0:
-            subprocess.run(['./main', PROBLEM], cwd='src-c/')
-        else:
-            subprocess.run(['./main', PROBLEM, '--max_retry={}'.format(i)], cwd='src-c/')
+        try:
+            if i == 0:
+                subprocess.run(['./main', PROBLEM], cwd='src-c/', timeout=TIMEOUT_SECS)
+            else:
+                subprocess.run(['./main', PROBLEM, '--max_retry={}'.format(i)], cwd='src-c/', timeout=TIMEOUT_SECS)
+        except subprocess.TimeoutExpired:
+            return {"success": False, "other_error":True, "timeout_reached": TIMEOUT_SECS}
+
         refiner_log_lines = None
         try:
             with open(c_runtime_path + '/refiner_log.txt', 'r') as refiner_log_file:
